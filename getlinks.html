@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Links</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .link-list {
+            margin-top: 20px;
+        }
+        .link-item {
+            margin-bottom: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Extract Links</h1>
+    <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+    <button onclick="extractLinks()">Extract Links</button>
+    <div class="link-list" id="linkList">
+        <!-- Your extracted links will be listed here -->
+    </div>
+    <button onclick="copyLinks()">Copy Links</button>
+    <script>
+        function extractLinks() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const linkList = document.getElementById('linkList');
+            linkList.innerHTML = ''; // Clear previous links
+            
+            // Regex pattern to match URLs
+            const urlPattern = /https?:\/\/\S+/g;
+            const urls = inputText.match(urlPattern) || [];
+            
+            urls.forEach(url => {
+                // Create a link element and add it to the list
+                const linkItem = document.createElement('div');
+                linkItem.classList.add('link-item');
+                const anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.textContent = url;
+                linkItem.appendChild(anchor);
+                linkList.appendChild(linkItem);
+            });
+        }
+        
+        function copyLinks() {
+            const linkList = document.getElementById('linkList');
+            const linksText = Array.from(linkList.querySelectorAll('a')).map(a => a.href).join('\n');
+            
+            // Create a temporary textarea to copy text
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = linksText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            
+            console.log('Copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
