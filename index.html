@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclei Result Sorter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1080px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        button, a.only-links {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+        button:hover, a.only-links:hover {
+            background-color: #0056b3;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+        .colored-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 16px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .colored-text span {
+            margin-right: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .colored-text span:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        .word1 { color: #FF6347; } /* Tomato */
+        .word2 { color: #1E90FF; } /* DodgerBlue */
+        .word3 { color: #32CD32; } /* LimeGreen */
+        .word4 { color: #FF69B4; } /* HotPink */
+        .word5 { color: #FFD700; } /* Gold */
+        /* Add more classes for additional colors as needed */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nuclei Result Sorter</h1>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        <div class="button-container">
+            <button onclick="sortAndColorText()">Sort</button>
+            <a href="getlinks.html" class="only-links"  target="_blank">Only Links</a>
+        </div>
+        <h2>Sorted output:</h2>
+        <div id="outputText" class="colored-text"></div>
+    </div>
+
+    <script>
+        function sortAndColorText() {
+            const inputText = document.getElementById('inputText').value;
+            const lines = inputText.split('\n').filter(line => line.trim() !== '');
+
+            // Sort lines based on the pattern inside square brackets
+            lines.sort((a, b) => {
+                const getKey = line => {
+                    const matchA = line.match(/\[([^\]]+)\]/);
+                    return matchA ? matchA[1].toLowerCase() : '';
+                };
+                return getKey(a).localeCompare(getKey(b));
+            });
+
+            let wordsMap = {};
+            let outputHTML = '';
+
+            // Process each line, split into words and colorize based on occurrence
+            lines.forEach(line => {
+                const words = line.trim().split(/\s+/);
+                words.forEach(word => {
+                    if (word !== '') {
+                        if (!wordsMap[word]) {
+                            wordsMap[word] = 'word' + (Object.keys(wordsMap).length % 5 + 1);
+                        }
+                        outputHTML += `<span class="${wordsMap[word]}">${word}</span> `;
+                    }
+                });
+                outputHTML += '<br>'; // Add line break after each line
+            });
+
+            document.getElementById('outputText').innerHTML = outputHTML;
+        }
+    </script>
+</body>
+</html>
