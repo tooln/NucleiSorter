@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extract Links</title>
+    <title>Link Extractor</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             padding: 20px;
+        }
+        h1 {
+            color: #4a4a4a;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
         .link-list {
             margin-top: 20px;
         }
         .link-item {
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         a {
             text-decoration: none;
-            color: blue;
+            color: #007bff;
         }
         a:hover {
             text-decoration: underline;
@@ -26,12 +38,12 @@
         textarea {
             width: 100%;
             height: 150px;
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 14px;
-            line-height: 1.4;
-            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
@@ -41,31 +53,50 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
         }
         button:hover {
             background-color: #0056b3;
         }
+        .feedback {
+            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Extract Links</h1>
-    <textarea id="inputText" placeholder="Paste your text here..."></textarea>
-    <button onclick="extractLinks()">Extract Links</button>
-    <div class="link-list" id="linkList">
-        <!-- Your extracted links will be listed here -->
+    <div class="container">
+        <h1>Link Extractor</h1>
+        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+        <button onclick="extractLinks()">Extract Links</button>
+        <div class="link-list" id="linkList">
+            <!-- Your extracted links will be listed here -->
+        </div>
+        <button onclick="copyLinks()">Copy Links</button>
+        <div class="feedback" id="feedback"></div>
     </div>
-    <button onclick="copyLinks()">Copy Links</button>
     <script>
         function extractLinks() {
             const inputText = document.getElementById('inputText').value.trim();
             const linkList = document.getElementById('linkList');
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = ''; // Clear previous feedback
             linkList.innerHTML = ''; // Clear previous links
-            
-            // Regex pattern to match URLs
-            const urlPattern = /https?:\/\/\S+/g;
+
+            if (!inputText) {
+                feedback.textContent = 'Please paste some text to extract links.';
+                return;
+            }
+
+            // More robust regex pattern to match URLs
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
             const urls = inputText.match(urlPattern) || [];
-            
+
+            if (urls.length === 0) {
+                feedback.textContent = 'No links found in the text.';
+                return;
+            }
+
             urls.forEach(url => {
                 // Create a link element and add it to the list
                 const linkItem = document.createElement('div');
@@ -73,15 +104,22 @@
                 const anchor = document.createElement('a');
                 anchor.href = url;
                 anchor.textContent = url;
+                anchor.setAttribute('aria-label', url);
                 linkItem.appendChild(anchor);
                 linkList.appendChild(linkItem);
             });
         }
-        
+
         function copyLinks() {
             const linkList = document.getElementById('linkList');
+            const feedback = document.getElementById('feedback');
             const linksText = Array.from(linkList.querySelectorAll('a')).map(a => a.href).join('\n');
-            
+
+            if (!linksText) {
+                feedback.textContent = 'No links to copy.';
+                return;
+            }
+
             // Create a temporary textarea to copy text
             const tempTextarea = document.createElement('textarea');
             tempTextarea.value = linksText;
@@ -89,8 +127,8 @@
             tempTextarea.select();
             document.execCommand('copy');
             document.body.removeChild(tempTextarea);
-            
-            console.log('Copied to clipboard!');
+
+            feedback.textContent = 'Links copied to clipboard!';
         }
     </script>
 </body>
